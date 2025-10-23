@@ -1,5 +1,7 @@
 # Mini Roadmap Visualiser
 
+🚀 **Live demo:** [Roadmap Visualiser](https://sps-github.github.io/mini-roadmap-visualiser/)
+
 A tiny, **static** roadmap you can host on GitHub Pages. Shows items grouped by **quarter** with **RICE** scores.
 
 **Great for:** prioritisation frameworks, stakeholder comms, lightweight PM visuals.
