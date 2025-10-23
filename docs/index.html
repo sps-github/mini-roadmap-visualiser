@@ -7,237 +7,232 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-  --bg: #f8f9fb;
-  --card: #ffffff;
-  --text: #0f0f13;
-  --muted: #5a5a67;
-  --border: #e7e9f0;
-  --accent1: #6C63FF;
-  --accent2: #74F0C1;
-  --shadow: 0 4px 16px rgba(0,0,0,0.04);
-}
+      :root {
+        --bg: #f8f9fb;
+        --card: #ffffff;
+        --text: #0f0f13;
+        --muted: #5a5a67;
+        --border: #e7e9f0;
+        --accent1: #6C63FF;
+        --accent2: #74F0C1;
+        --shadow: 0 4px 16px rgba(0,0,0,0.04);
+        --warn-bg: #fff6e5;
+        --warn-text: #8a5b00;
+        --warn-border: #ffd89e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0c10;
+          --card: #14151b;
+          --text: #f3f4f8;
+          --muted: #a3a3b5;
+          --border: #24262e;
+          --accent1: #8b82ff;
+          --accent2: #4de0b5;
+          --shadow: 0 4px 20px rgba(0,0,0,0.5);
+          --warn-bg: #2b210e;
+          --warn-text: #ffd79a;
+          --warn-border: #3a2b11;
+        }
+      }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0c10;
-    --card: #14151b;
-    --text: #f3f4f8;
-    --muted: #a3a3b5;
-    --border: #24262e;
-    --accent1: #8b82ff;
-    --accent2: #4de0b5;
-    --shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-}
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
 
-* { box-sizing: border-box; }
-html, body { height: 100%; }
+      /* solid background to remove banding line */
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        margin: 0;
+        padding: 40px clamp(16px, 5vw, 64px);
+      }
+      @media (prefers-color-scheme: dark) { body { background: var(--bg); } }
 
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
-  margin: 0;
-  padding: 40px clamp(16px, 5vw, 64px);
-  background: linear-gradient(180deg, #f8f9fb 0%, #eef0f8 100%);
-}
+      /* --- top bar --- */
+      .topbar{
+        display:flex; align-items:center; justify-content:space-between;
+        margin-bottom: 18px; padding: 10px 14px;
+        background: var(--card); border:1px solid var(--border); border-radius:14px;
+        box-shadow: var(--shadow);
+      }
+      .brand{ display:flex; gap:10px; align-items:center; font-weight:700; }
+      .brand span{ font-size: 16px; letter-spacing: .1px; }
+      .topbar .brand { margin-right: auto; }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: linear-gradient(180deg, #0b0c10 0%, #161821 100%);
-  }
-}
+      .btn-ghost{
+        background: transparent; color: var(--text);
+        border:1px solid var(--border);
+        padding:8px 10px; border-radius:10px;
+        box-shadow:none; cursor:pointer;
+      }
+      .btn-ghost:hover{ box-shadow: 0 3px 10px rgba(0,0,0,.06); transform: translateY(0); }
 
-h1 {
-  font-weight: 700;
-  font-size: clamp(28px, 3vw, 38px);
-  background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 12px;
-}
+      .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
-#count {
-  background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  color: white;
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 13px;
-  margin-left: 10px;
-}
+      h1 {
+        display:flex; align-items:center; gap:8px;
+        font-weight: 700;
+        font-size: clamp(28px, 3vw, 38px);
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 12px;
+      }
+      #count {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        color: #fff;
+        margin-left: 8px;
+      }
 
-.controls {
-  margin: 20px 0 28px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+      .controls {
+        margin: 20px 0 28px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      label {
+        font-size: 13px;
+        color: var(--muted);
+        display:inline-flex; gap:8px; align-items:center;
+        background: var(--card);
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        position: relative; overflow: hidden; /* keep focus ring inside */
+      }
+      input, select, textarea {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-family: inherit;
+        background: var(--card);
+        color: var(--text);
+        outline: none;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+      }
+      /* focus ring fix: no spill */
+      input:focus, select:focus, textarea:focus {
+        box-shadow: none;
+        outline: 2px solid var(--accent1);
+        outline-offset: -2px;
+      }
+      label:focus-within { border-color: var(--accent1); }
 
-label {
-  font-size: 13px;
-  color: var(--muted);
-}
+      .toolbar{ display:flex; gap:10px; margin-left:auto }
 
-input, select, textarea {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-family: inherit;
-  background: var(--card);
-  color: var(--text);
-  outline: none;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-}
+      .btn {
+        border: none;
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        color: white;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 10px 16px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(108, 99, 255, 0.2);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(108, 99, 255, 0.3); }
+      .btn:active { transform: translateY(0); }
 
-input:focus, select:focus, textarea:focus {
-  border-color: var(--accent1);
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
-}
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 18px 20px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+      .pill {
+        display: inline-block;
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        color: white;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        margin-left: 8px;
+      }
+      .meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+      .score { font-weight: 700; color: var(--accent1); }
 
-.btn {
-  border: none;
-  background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  color: white;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 10px 16px;
-  cursor: pointer;
-  box-shadow: 0 3px 10px rgba(108, 99, 255, 0.2);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(108, 99, 255, 0.3);
-}
-.btn:active { transform: translateY(0); }
+      .warn {
+        margin-top:8px;
+        background: var(--warn-bg);
+        color: var(--warn-text);
+        border: 1px solid var(--warn-border);
+        padding: 6px 10px;
+        border-radius:10px;
+        font-size:12px;
+      }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
+      .section { margin-top: 40px; }
+      h2 {
+        font-weight: 600;
+        margin-bottom: 12px;
+        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  padding: 18px 20px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
+      .form {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        box-shadow: var(--shadow);
+      }
+      .form textarea{
+        min-height: 80px; resize: vertical;
+      }
+      .help { font-size: 13px; color: var(--muted); margin: 8px 0 16px; }
 
-.pill {
-  display: inline-block;
-  background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  color: white;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  margin-left: 8px;
-}
-
-.meta {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 6px;
-}
-
-.score {
-  font-weight: 700;
-  color: var(--accent1);
-}
-
-.section {
-  margin-top: 40px;
-}
-
-h2 {
-  font-weight: 600;
-  margin-bottom: 12px;
-  background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.form {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  box-shadow: var(--shadow);
-}
-
-.help {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 8px 0 16px;
-}
-/* --- top bar --- */
-.topbar{
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom: 18px; padding: 10px 14px;
-  background: var(--card); border:1px solid var(--border); border-radius:14px;
-  box-shadow: var(--shadow);
-}
-.brand{ display:flex; gap:10px; align-items:center; font-weight:700; }
-.brand span{ font-size: 16px; letter-spacing: .1px; }
-
-/* ghost button for header toggle */
-.btn-ghost{
-  background: transparent; color: var(--text);
-  border:1px solid var(--border);
-  padding:8px 10px; border-radius:10px;
-  box-shadow:none;
-}
-.btn-ghost:hover{ box-shadow: 0 3px 10px rgba(0,0,0,.06); transform: translateY(0); }
-
-/* tiny a11y helper */
-.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-
-/* --- manual theme overrides (Light/Dark) --- */
-/* Default uses your existing variables. These let the toggle force a theme. */
-html[data-theme="light"]{
-  --bg: #f8f9fb; --card:#ffffff; --text:#0f0f13; --muted:#5a5a67; --border:#e7e9f0;
-  --accent1:#6C63FF; --accent2:#74F0C1; --shadow:0 4px 16px rgba(0,0,0,.04);
-}
-html[data-theme="dark"]{
-  --bg:#0b0c10; --card:#14151b; --text:#f3f4f8; --muted:#a3a3b5; --border:#24262e;
-  --accent1:#8b82ff; --accent2:#4de0b5; --shadow:0 4px 20px rgba(0,0,0,.5);
-  background: linear-gradient(180deg, #0b0c10 0%, #161821 100%);
-}
-
+      /* capacity planner panel */
+      .planner{
+        background: var(--card);
+        border:1px solid var(--border);
+        border-radius:18px;
+        padding:16px;
+        box-shadow: var(--shadow);
+      }
+      .plan-results{ margin-top:12px; font-size:14px; }
+      .plan-results ul{ margin:8px 0 0 18px; }
     </style>
   </head>
   <body>
-<header class="topbar">
-  <div class="brand">
-    <!-- Spark logo -->
-    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="var(--accent1)"/>
-          <stop offset="1" stop-color="var(--accent2)"/>
-        </linearGradient>
-      </defs>
-      <path fill="url(#g)" d="M12 2l1.9 4.8L19 8l-4.7 2 1.7 5.1L12 12.8 8 15.1 9.7 10 5 8l5.1-1.2L12 2z"/>
-    </svg>
-    <span>Roadmap Visualiser</span>
-  </div>
+    <header class="topbar">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0" stop-color="var(--accent1)"/>
+              <stop offset="1" stop-color="var(--accent2)"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#g)" d="M12 2l1.9 4.8L19 8l-4.7 2 1.7 5.1L12 12.8 8 15.1 9.7 10 5 8l5.1-1.2L12 2z"/>
+        </svg>
+        <span>Roadmap Visualiser</span>
+      </div>
+      <button id="themeToggle" class="btn-ghost" type="button" title="Toggle dark / light">
+        <span id="themeIcon" aria-hidden="true">🌙</span>
+        <span id="themeLabel" class="sr-only">Dark</span>
+      </button>
+    </header>
 
-  <button id="themeToggle" class="btn btn-ghost" type="button" title="Toggle dark / light">
-    <span id="themeIcon" aria-hidden="true">🌙</span>
-    <span id="themeLabel" class="sr-only">Dark</span>
-  </button>
-</header>
-    <h1>Roadmap Visualiser <span class="count-pill" id="count"></span></h1>
+    <h1>Roadmap Visualiser <span id="count"></span></h1>
 
     <div class="controls">
       <label>Quarter:
@@ -261,11 +256,31 @@ html[data-theme="dark"]{
       </label>
       <div class="toolbar">
         <button id="downloadBtn" class="btn">Download JSON</button>
-        <button id="resetLocalBtn" class="btn" title="Clear only your browser’s saved items">Reset local changes</button>
+        <button id="resetLocalBtn" class="btn" title="Clear only your browser’s saved items">Reset local</button>
       </div>
     </div>
 
     <div class="grid" id="grid"></div>
+
+    <!-- Capacity planner -->
+    <div class="section">
+      <h2>Capacity fit</h2>
+      <div class="planner">
+        <div class="help">Enter team capacity (in “effort” units for the selected quarter). Click <strong>Suggest plan</strong> to pick the highest-value set that fits.</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+          <label>Quarter
+            <select id="planQuarter">
+              <option>2025 Q1</option><option>2025 Q2</option><option>2025 Q3</option><option>2025 Q4</option>
+            </select>
+          </label>
+          <label>Capacity
+            <input id="planCapacity" type="number" min="1" value="8" />
+          </label>
+          <button id="planBtn" class="btn">Suggest plan</button>
+        </div>
+        <div id="planOut" class="plan-results"></div>
+      </div>
+    </div>
 
     <div class="section">
       <h2>Add a project</h2>
@@ -307,11 +322,15 @@ html[data-theme="dark"]{
             <option value="5">5 — 2+ months</option>
           </select>
         </label>
+        <label>Depends on (titles, comma-separated)<br/>
+          <input id="f_depends" placeholder="e.g., SDK adapter layer, Data pipeline" />
+        </label>
         <label style="grid-column:1/-1;">Description<br/>
           <textarea id="f_description" placeholder="Short scope / why it matters"></textarea>
         </label>
-        <div class="row" style="grid-column:1/-1;">
+        <div class="row" style="grid-column:1/-1; display:flex; gap:10px; align-items:center;">
           <button class="btn" id="addBtn">Add</button>
+          <button class="btn-ghost" id="aiBtn" type="button" title="Suggest scores from title/description">AI Assist</button>
         </div>
       </div>
 
@@ -327,11 +346,17 @@ html[data-theme="dark"]{
     </div>
 
     <script>
+      // ---------- State & utils ----------
       const state = { items: [], quarter: "", sortBy: "rice", search: "" };
       const LS_KEY = "roadmap_custom_items_v1";
+      const THEME_KEY = "rv_theme";
 
       function riceScore(i){ return Math.round((i.reach * i.impact * i.confidence) / Math.max(1, i.effort)); }
+      function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+      function val(id){ return document.getElementById(id).value; }
+      function num(id){ return parseFloat(val(id) || '0'); }
 
+      // ---------- Load ----------
       async function load() {
         const res = await fetch('data.json', {cache:'no-store'});
         const base = await res.json();
@@ -340,63 +365,83 @@ html[data-theme="dark"]{
         render();
       }
 
+      // ---------- Render ----------
       function render(){
         const q = state.quarter, s = state.sortBy, term = state.search.toLowerCase();
-        let filtered = state.items.filter(i => (!q || i.quarter === q) && i.title.toLowerCase().includes(term));
+
+        let filtered = state.items.filter(i =>
+          (!q || i.quarter === q) &&
+          i.title.toLowerCase().includes(term)
+        );
+
         filtered.sort((a,b)=>{
           if(s==="impact") return (b.impact - a.impact);
           if(s==="effort") return (a.effort - b.effort);
           return (riceScore(b) - riceScore(a));
         });
+
         document.getElementById('count').textContent = filtered.length + " items";
-        document.getElementById('grid').innerHTML = filtered.map(i=>`
+
+        // Map of title -> item for dependency checks
+        const byTitle = new Map(state.items.map(i => [i.title.trim().toLowerCase(), i]));
+
+        document.getElementById('grid').innerHTML = filtered.map(i=>{
+          const deps = (i.dependsOn || []).filter(Boolean);
+          const missing = deps.filter(d => !byTitle.has(d.trim().toLowerCase()));
+          const depsHtml = deps.length
+            ? `<div class="meta">Depends on: ${deps.map(escapeHtml).join(', ')}</div>` : '';
+
+          const warnHtml = missing.length
+            ? `<div class="warn">Missing dependency: ${missing.map(escapeHtml).join(', ')}</div>` : '';
+
+          return `
           <div class="card">
             <div><strong>${escapeHtml(i.title)}</strong> <span class="pill">${escapeHtml(i.quarter || '')}</span></div>
             <div class="meta">Owner: ${escapeHtml(i.owner || '—')} | Team: ${escapeHtml(i.team || '—')}</div>
             <div class="meta">Reach ${i.reach}, Impact ${i.impact}, Confidence ${i.confidence}, Effort ${i.effort}</div>
             <div class="meta score">RICE: ${riceScore(i)}</div>
+            ${depsHtml}
+            ${warnHtml}
             <p>${escapeHtml(i.description || '')}</p>
-          </div>
-        `).join('');
+          </div>`;
+        }).join('');
       }
 
-      function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-      // filters
+      // ---------- Filters ----------
       document.getElementById('quarterFilter').addEventListener('change', e => { state.quarter = e.target.value; render(); });
       document.getElementById('sortBy').addEventListener('change', e => { state.sortBy = e.target.value; render(); });
       document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
 
-      // add project
+      // ---------- Add item ----------
       document.getElementById('addBtn').addEventListener('click', () => {
         const item = {
-          title: val('f_title'),
+          title: val('f_title').trim(),
           quarter: val('f_quarter'),
-          owner: val('f_owner'),
-          team: val('f_team'),
+          owner: val('f_owner').trim(),
+          team: val('f_team').trim(),
           reach: num('f_reach'),
           impact: parseFloat(val('f_impact')),
           confidence: parseFloat(val('f_confidence')),
           effort: parseFloat(val('f_effort')),
+          dependsOn: val('f_depends').split(',').map(s=>s.trim()).filter(Boolean),
           description: val('f_description')
         };
         if(!item.title){ alert('Please enter a title'); return; }
-        // append to localStorage list
+
         const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
         extra.push(item);
         localStorage.setItem(LS_KEY, JSON.stringify(extra));
         state.items.push(item);
-        // reset a few fields
+
         document.getElementById('f_title').value = "";
         document.getElementById('f_description').value = "";
+        document.getElementById('f_depends').value = "";
         render();
         window.scrollTo({top:0, behavior:'smooth'});
       });
 
-      // download current dataset
+      // ---------- Download JSON ----------
       document.getElementById('downloadBtn').addEventListener('click', () => {
-        const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-        // base + extras so you can commit it later if you want to
         const blob = new Blob([JSON.stringify(state.items, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -405,7 +450,7 @@ html[data-theme="dark"]{
         URL.revokeObjectURL(a.href);
       });
 
-      // reset local additions (does not change the repo)
+      // ---------- Reset local ----------
       document.getElementById('resetLocalBtn').addEventListener('click', () => {
         if(confirm('Clear your locally added projects?')) {
           localStorage.removeItem(LS_KEY);
@@ -413,43 +458,160 @@ html[data-theme="dark"]{
         }
       });
 
-      function val(id){ return document.getElementById(id).value; }
-      function num(id){ return parseFloat(val(id) || '0'); }
+      // ---------- Capacity planner (0/1 knapsack with simple dependency respect) ----------
+      document.getElementById('planBtn').addEventListener('click', () => {
+        const q = val('planQuarter');
+        const cap = Math.max(0, parseFloat(val('planCapacity') || '0'));
+        const items = state.items.filter(i => i.quarter === q);
+        if(items.length === 0){ document.getElementById('planOut').innerHTML = '<div class="help">No items for that quarter.</div>'; return; }
 
+        // Build index
+        const idx = new Map(items.map((it, k) => [it.title.trim().toLowerCase(), k]));
+
+        // Simple DP knapsack by effort weight (effort 1..5)
+        const n = items.length;
+        const W = Math.floor(cap);
+        const dp = Array.from({length:n+1}, ()=>Array(W+1).fill(0));
+        for(let i=1;i<=n;i++){
+          const it = items[i-1];
+          const w = Math.min(W, Math.max(0, Math.floor(it.effort||0)));
+          const v = riceScore(it);
+          for(let wgt=0; wgt<=W; wgt++){
+            dp[i][wgt] = dp[i-1][wgt];
+            if(w>0 && w<=wgt){
+              dp[i][wgt] = Math.max(dp[i][wgt], dp[i-1][wgt-w] + v);
+            }
+          }
+        }
+        // Backtrack
+        let wgt=W; const chosen=[];
+        for(let i=n;i>=1;i--){
+          if(dp[i][wgt]!==dp[i-1][wgt]){
+            const it = items[i-1];
+            chosen.push(it);
+            wgt -= Math.min(W, Math.max(0, Math.floor(it.effort||0)));
+          }
+        }
+        chosen.reverse();
+
+        // Ensure dependencies: if a chosen item depends on something not chosen, try to include it if capacity allows
+        const chosenSet = new Set(chosen.map(i=>i.title.trim().toLowerCase()));
+        let addedDeps = [];
+        for(const it of [...chosen]){
+          for(const d of (it.dependsOn||[])){
+            const key = d.trim().toLowerCase();
+            if(!key) continue;
+            if(!chosenSet.has(key) && idx.has(key)){
+              const dep = items[idx.get(key)];
+              const e = Math.max(0, Math.floor(dep.effort||0));
+              if(wgt - e >= 0){
+                chosen.push(dep);
+                chosenSet.add(key);
+                wgt -= e;
+                addedDeps.push(dep.title);
+              }
+            }
+          }
+        }
+
+        const totalEffort = chosen.reduce((s,i)=>s+Number(i.effort||0),0);
+        const totalRICE = chosen.reduce((s,i)=>s+riceScore(i),0);
+        const overflow = items.filter(i => !chosenSet.has(i.title.trim().toLowerCase()));
+
+        document.getElementById('planOut').innerHTML = `
+          <div><strong>Quarter:</strong> ${escapeHtml(q)} &nbsp; <strong>Capacity:</strong> ${cap}</div>
+          <div class="help">Selected ${chosen.length} items (effort ${totalEffort.toFixed(1)}, RICE total ${totalRICE}).</div>
+          ${addedDeps.length ? `<div class="help">Included dependencies: ${addedDeps.map(escapeHtml).join(', ')}</div>` : ''}
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+            <div>
+              <strong>✅ Fits</strong>
+              <ul>${chosen.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul>
+            </div>
+            <div>
+              <strong>⏭ Overflow</strong>
+              <ul>${overflow.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul>
+            </div>
+          </div>
+        `;
+      });
+
+      // ---------- AI Assist (heuristic, no API required) ----------
+      document.getElementById('aiBtn').addEventListener('click', () => {
+        const title = val('f_title').toLowerCase();
+        const desc  = val('f_description').toLowerCase();
+        const text = title + " " + desc;
+
+        // naive keyword features
+        const bigReach   = /onboard|signup|email|notification|search|feed|mobile|landing|ai assistant|automa|automation|import|export/.test(text);
+        const infra      = /sdk|api|adapter|platform|infra|schema|pipeline|etl|migration|refactor|cache|index/.test(text);
+        const analytics  = /analytics|dashboard|insight|metric|report|cohort|funnel|experiment|ab test/.test(text);
+        const risk       = /privacy|security|trust|auth|gdpr|consent|pci|audit|bias|safety/.test(text);
+        const newFlow    = /onboard|checkout|wizard|flow|journey|activation|retention/.test(text);
+
+        // suggest reach
+        let reach = 200;
+        if(bigReach) reach = 800;
+        if(analytics) reach = Math.max(reach, 600);
+        if(infra) reach = Math.min(reach, 400); // infra often indirect
+
+        // suggest impact (3/2/1/0.5)
+        let impact = 2;
+        if(newFlow || bigReach) impact = 3;
+        if(infra) impact = Math.min(impact, 2);
+        if(/bug|fix|minor|copy/.test(text)) impact = 1;
+
+        // suggest effort (1..5)
+        let effort = 2;
+        if(infra || risk) effort = 3;
+        if(/rewrite|migration|platform|data warehouse|real\-time/.test(text)) effort = 4;
+        if(/mvp|prototype|quick|small/.test(text)) effort = 1;
+
+        // confidence
+        let confidence = 0.8;
+        if(/hypothesis|explore|spike|idea/.test(text)) confidence = 0.6;
+        if(/validated|user research|beta|pilot|data shows/.test(text)) confidence = 1.0;
+
+        // push values into the form
+        document.getElementById('f_reach').value = reach;
+        document.getElementById('f_impact').value = String(impact);
+        document.getElementById('f_effort').value = String(effort);
+        document.getElementById('f_confidence').value = String(confidence);
+      });
+
+      // ---------- Theme toggle ----------
+      const rootEl = document.documentElement;
+      const btnToggle = document.getElementById("themeToggle");
+      const icon = document.getElementById("themeIcon");
+      const label = document.getElementById("themeLabel");
+
+      function applySavedTheme(){
+        const saved = localStorage.getItem(THEME_KEY); // "light" | "dark" | null
+        if(saved === "light" || saved === "dark"){
+          rootEl.setAttribute("data-theme", saved);
+        } else {
+          rootEl.removeAttribute("data-theme"); // follow system
+        }
+        updateToggleVisuals();
+      }
+      function toggleTheme(){
+        const forced = rootEl.getAttribute("data-theme");
+        const next = forced === "dark" ? "light" : "dark";
+        rootEl.setAttribute("data-theme", next);
+        localStorage.setItem(THEME_KEY, next);
+        updateToggleVisuals();
+      }
+      function updateToggleVisuals(){
+        const isDarkForced = rootEl.getAttribute("data-theme") === "dark";
+        const isDarkAuto = !rootEl.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const isDark = isDarkForced || isDarkAuto;
+        icon.textContent = isDark ? "☀️" : "🌙";
+        label.textContent = isDark ? "Light" : "Dark";
+      }
+      btnToggle.addEventListener("click", toggleTheme);
+
+      // go!
+      applySavedTheme();
       load();
-// ---- Theme toggle (persisted in localStorage) ----
-const THEME_KEY = "rv_theme";
-const rootEl = document.documentElement;
-const btnToggle = document.getElementById("themeToggle");
-const icon = document.getElementById("themeIcon");
-const label = document.getElementById("themeLabel");
-
-function applySavedTheme(){
-  const saved = localStorage.getItem(THEME_KEY); // "light" | "dark" | null
-  if(saved === "light" || saved === "dark"){
-    rootEl.setAttribute("data-theme", saved);
-  } else {
-    rootEl.removeAttribute("data-theme"); // follow system
-  }
-  updateToggleVisuals();
-}
-function toggleTheme(){
-  const forced = rootEl.getAttribute("data-theme");
-  const next = forced === "dark" ? "light" : "dark";
-  rootEl.setAttribute("data-theme", next);
-  localStorage.setItem(THEME_KEY, next);
-  updateToggleVisuals();
-}
-function updateToggleVisuals(){
-  const isDarkForced = rootEl.getAttribute("data-theme") === "dark";
-  const isDarkAuto = !rootEl.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const isDark = isDarkForced || isDarkAuto;
-  icon.textContent = isDark ? "☀️" : "🌙";
-  label.textContent = isDark ? "Light" : "Dark";
-}
-btnToggle.addEventListener("click", toggleTheme);
-applySavedTheme();
-
     </script>
   </body>
 </html>
