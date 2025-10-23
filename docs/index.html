@@ -19,6 +19,10 @@
         --warn-bg: #fff6e5;
         --warn-text: #8a5b00;
         --warn-border: #ffd89e;
+        --chip-bg: #f4f5fb;
+        --chip-text: #2c2c35;
+        --chip-border: #e4e6f2;
+        --btn-solid: #6C63FF; /* solid purple buttons */
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -33,13 +37,16 @@
           --warn-bg: #2b210e;
           --warn-text: #ffd79a;
           --warn-border: #3a2b11;
+          --chip-bg: #1a1b22;
+          --chip-text: #e6e6ee;
+          --chip-border: #272935;
+          --btn-solid: #8b82ff;
         }
       }
 
       * { box-sizing: border-box; }
       html, body { height: 100%; }
 
-      /* solid background to remove banding line */
       body {
         font-family: 'Inter', system-ui, sans-serif;
         color: var(--text);
@@ -47,7 +54,6 @@
         margin: 0;
         padding: 40px clamp(16px, 5vw, 64px);
       }
-      @media (prefers-color-scheme: dark) { body { background: var(--bg); } }
 
       /* --- top bar --- */
       .topbar{
@@ -104,7 +110,7 @@
         border: 1px solid var(--border);
         border-radius: 12px;
         box-shadow: var(--shadow);
-        position: relative; overflow: hidden; /* keep focus ring inside */
+        position: relative; overflow: hidden;
       }
       input, select, textarea {
         border: 1px solid var(--border);
@@ -116,7 +122,6 @@
         outline: none;
         transition: border 0.2s ease, box-shadow 0.2s ease;
       }
-      /* focus ring fix: no spill */
       input:focus, select:focus, textarea:focus {
         box-shadow: none;
         outline: 2px solid var(--accent1);
@@ -124,21 +129,22 @@
       }
       label:focus-within { border-color: var(--accent1); }
 
-      .toolbar{ display:flex; gap:10px; margin-left:auto }
+      .toolbar{ display:flex; gap:10px; margin-left:auto; flex-wrap:wrap; }
 
       .btn {
         border: none;
-        background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        background: var(--btn-solid) !important; /* solid purple */
         color: white;
         font-weight: 600;
         border-radius: 10px;
         padding: 10px 16px;
         cursor: pointer;
         box-shadow: 0 3px 10px rgba(108, 99, 255, 0.2);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
       }
       .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(108, 99, 255, 0.3); }
       .btn:active { transform: translateY(0); }
+      .btn[disabled]{ opacity:.6; cursor:not-allowed; }
 
       .grid {
         display: grid;
@@ -195,9 +201,7 @@
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         box-shadow: var(--shadow);
       }
-      .form textarea{
-        min-height: 80px; resize: vertical;
-      }
+      .form textarea{ min-height: 80px; resize: vertical; }
       .help { font-size: 13px; color: var(--muted); margin: 8px 0 16px; }
 
       /* capacity planner panel */
@@ -210,18 +214,28 @@
       }
       .plan-results{ margin-top:12px; font-size:14px; }
       .plan-results ul{ margin:8px 0 0 18px; }
-.help-inline{
-  margin: 4px 0 12px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.help-inline code{
-  background: var(--chip-bg);
-  color: var(--chip-text);
-  border: 1px solid var(--chip-border);
-  border-radius: 6px;
-  padding: 0 6px;
-}
+
+      /* dependency chips */
+      .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+      .chip{
+        display:inline-flex; align-items:center; gap:6px;
+        background: var(--chip-bg);
+        color: var(--chip-text);
+        border: 1px solid var(--chip-border);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size:12px;
+        cursor:pointer;
+      }
+      .chip:hover{ filter: brightness(0.98); }
+
+      /* small subtext */
+      .subtle{ font-size:12px; color: var(--muted); margin-top: 4px; }
+
+      /* theme toggle visuals */
+      [data-theme="dark"] .topbar, [data-theme="dark"] .form, [data-theme="dark"] .planner, [data-theme="dark"] .card{
+        backdrop-filter: saturate(1.2);
+      }
     </style>
   </head>
   <body>
@@ -269,6 +283,8 @@
       <div class="toolbar">
         <button id="downloadBtn" class="btn">Download JSON</button>
         <button id="resetLocalBtn" class="btn" title="Clear only your browser’s saved items">Reset local</button>
+        <button id="themesBtn" class="btn-ghost" type="button" title="Group items by theme">Themes</button>
+        <button id="weeklyBtn" class="btn-ghost" type="button" title="Exec summary of changes since last week">Weekly summary</button>
       </div>
     </div>
 
@@ -278,12 +294,7 @@
     <div class="section">
       <h2>Capacity fit</h2>
       <div class="planner">
-        <div class="help">
-  Enter team capacity in <strong>Effort units</strong> for the selected quarter, then click
-  <strong>Suggest plan</strong>. We’ll choose the mix of projects that
-  <strong>maximises total RICE</strong> without exceeding capacity. We also try to include any
-  <strong>dependencies</strong>.
-</div>
+        <div class="help">Enter team capacity (in “effort” units for the selected quarter). Click <strong>Suggest plan</strong> to pick the highest-value set that fits. We’ll also try to include any <strong>dependencies</strong>.</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
           <label>Quarter
             <select id="planQuarter">
@@ -301,7 +312,10 @@
 
     <div class="section">
       <h2>Add a project</h2>
-      <div class="help">This updates your view immediately and saves to your browser only (localStorage). Use “Download JSON” to export and commit later.</div>
+      <div class="help">
+        Fill title + one-liner. Optional: click <strong>Ask AI</strong> to get suggested Reach/Impact/Effort and a confidence rationale; you can tweak before saving.
+      </div>
+
       <div class="form" id="addForm">
         <label>Title<br/><input id="f_title" required /></label>
         <label>Quarter<br/>
@@ -312,6 +326,7 @@
         </label>
         <label>Owner<br/><input id="f_owner" placeholder="e.g., Sarah" /></label>
         <label>Team<br/><input id="f_team" placeholder="e.g., Core" /></label>
+
         <label>Reach<br/><input id="f_reach" type="number" min="0" value="100" /></label>
         <label>Impact<br/>
           <select id="f_impact">
@@ -339,20 +354,25 @@
             <option value="5">5 — 2+ months</option>
           </select>
         </label>
-<label>Dependencies<br/>
-  <input id="f_depends" placeholder="Type project titles, separated by commas" />
-</label>
-<div class="help help-inline">
-  List any projects this one <em>needs first</em>. Use exact titles, separated by commas.
-  Example: <code>SDK adapter layer, Data pipeline</code>
-</div>
-        <label style="grid-column:1/-1;">Description<br/>
-          <textarea id="f_description" placeholder="Short scope / why it matters"></textarea>
+
+        <label style="grid-column:1/-1;">Dependencies<br/>
+          <input id="f_depends" placeholder="Type exact project titles, comma-separated" />
+          <div class="subtle">Add prerequisites this project needs. Click suggestions below to append.</div>
+          <div id="dep_suggest" class="chips" aria-live="polite"></div>
         </label>
-        <div class="row" style="grid-column:1/-1; display:flex; gap:10px; align-items:center;">
+
+        <label style="grid-column:1/-1;">Description<br/>
+          <textarea id="f_description" placeholder="One-liner scope / why it matters"></textarea>
+        </label>
+
+        <div class="row" style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <button class="btn" id="addBtn">Add</button>
-          <button class="btn-ghost" id="aiBtn" type="button" title="Suggest scores from title/description">AI Assist</button>
+          <button class="btn-ghost" id="aiLocalBtn" type="button" title="Heuristic score from title/description (no API)">Quick score</button>
+          <button class="btn-ghost" id="askAIBtn" type="button" title="Use your LLM endpoint to suggest ranges">Ask AI</button>
+          <span id="aiNote" class="subtle">Ask AI is hidden without an <code>AI_API_KEY</code>.</span>
         </div>
+
+        <div id="aiExplain" class="help" style="grid-column:1/-1; display:none;"></div>
       </div>
 
       <div class="section">
@@ -364,13 +384,29 @@
           Confidence: 1.0 strong data, 0.8 fairly confident, 0.6 moderate, 0.4 low
         </div>
       </div>
+
+      <div id="themesSection" class="section" style="display:none;">
+        <h2>Themes (auto)</h2>
+        <div id="themesOut" class="grid"></div>
+      </div>
+
+      <div id="weeklySection" class="section" style="display:none;">
+        <h2>Weekly exec summary</h2>
+        <div id="weeklyOut" class="card"></div>
+      </div>
     </div>
 
     <script>
+      // ---------- Config for AI (optional) ----------
+      // Expose a key like: window.AI_API_KEY = "sk-..."; window.AI_ENDPOINT = "https://your-llm-endpoint/rice";
+      const AI_KEY = window.AI_API_KEY || null;
+      const AI_ENDPOINT = window.AI_ENDPOINT || null;
+
       // ---------- State & utils ----------
       const state = { items: [], quarter: "", sortBy: "rice", search: "" };
       const LS_KEY = "roadmap_custom_items_v1";
       const THEME_KEY = "rv_theme";
+      const SNAP_KEY = "rv_snapshot_v1"; // for weekly summary
 
       function riceScore(i){ return Math.round((i.reach * i.impact * i.confidence) / Math.max(1, i.effort)); }
       function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -384,6 +420,7 @@
         const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
         state.items = [...base, ...extra];
         render();
+        refreshDepSuggestions();
       }
 
       // ---------- Render ----------
@@ -410,7 +447,7 @@
           const deps = (i.dependsOn || []).filter(Boolean);
           const missing = deps.filter(d => !byTitle.has(d.trim().toLowerCase()));
           const depsHtml = deps.length
-  ? `<div class="meta">Dependencies: ${deps.map(escapeHtml).join(', ')}</div>` : '';
+            ? `<div class="meta">Dependencies: ${deps.map(escapeHtml).join(', ')}</div>` : '';
 
           const warnHtml = missing.length
             ? `<div class="warn">Missing dependency: ${missing.map(escapeHtml).join(', ')}</div>` : '';
@@ -427,6 +464,42 @@
           </div>`;
         }).join('');
       }
+
+      // ---------- Dependency suggestions UI ----------
+      const depInput = document.getElementById('f_depends');
+      const depSuggest = document.getElementById('dep_suggest');
+
+      function tokeniseDeps(){
+        return depInput.value.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      function currentDepQuery(){
+        const raw = depInput.value;
+        const lastComma = raw.lastIndexOf(',');
+        const q = lastComma === -1 ? raw : raw.slice(lastComma+1);
+        return q.trim().toLowerCase();
+      }
+      function refreshDepSuggestions(){
+        const query = currentDepQuery();
+        const chosen = new Set(tokeniseDeps().map(s => s.toLowerCase()));
+
+        const options = state.items
+          .map(i => i.title)
+          .filter(t => t && !chosen.has(t.toLowerCase()))
+          .filter(t => !query || t.toLowerCase().includes(query))
+          .slice(0, 12);
+
+        depSuggest.innerHTML = options.map(t => `<button type="button" class="chip" data-title="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+      }
+      depInput.addEventListener('input', refreshDepSuggestions);
+      depSuggest.addEventListener('click', (e) => {
+        const btn = e.target.closest('.chip');
+        if(!btn) return;
+        const title = btn.getAttribute('data-title');
+        let parts = depInput.value.split(',').map(s=>s.trim()).filter(Boolean);
+        if(!parts.includes(title)) parts.push(title);
+        depInput.value = parts.join(', ');
+        refreshDepSuggestions();
+      });
 
       // ---------- Filters ----------
       document.getElementById('quarterFilter').addEventListener('change', e => { state.quarter = e.target.value; render(); });
@@ -454,9 +527,13 @@
         localStorage.setItem(LS_KEY, JSON.stringify(extra));
         state.items.push(item);
 
+        // update snapshot baseline for weekly summary
+        saveSnapshot();
+
         document.getElementById('f_title').value = "";
         document.getElementById('f_description').value = "";
         document.getElementById('f_depends').value = "";
+        refreshDepSuggestions();
         render();
         window.scrollTo({top:0, behavior:'smooth'});
       });
@@ -489,7 +566,6 @@
         // Build index
         const idx = new Map(items.map((it, k) => [it.title.trim().toLowerCase(), k]));
 
-        // Simple DP knapsack by effort weight (effort 1..5)
         const n = items.length;
         const W = Math.floor(cap);
         const dp = Array.from({length:n+1}, ()=>Array(W+1).fill(0));
@@ -515,7 +591,7 @@
         }
         chosen.reverse();
 
-        // Ensure dependencies: if a chosen item depends on something not chosen, try to include it if capacity allows
+        // Ensure dependencies
         const chosenSet = new Set(chosen.map(i=>i.title.trim().toLowerCase()));
         let addedDeps = [];
         for(const it of [...chosen]){
@@ -554,59 +630,172 @@
             </div>
           </div>
         `;
-// Add a small legend beneath the results
-const planOutEl = document.getElementById('planOut');
-planOutEl.insertAdjacentHTML('beforeend', `
-  <div class="help" style="margin-top:8px">
-    Legend: <strong>E</strong> = Effort, <strong>R</strong> = RICE score.
-    We pick items that fit your capacity and try to include required dependencies.
-  </div>
-`);
-
       });
 
-      // ---------- AI Assist (heuristic, no API required) ----------
-      document.getElementById('aiBtn').addEventListener('click', () => {
+      // ---------- Local quick scoring (no API) ----------
+      document.getElementById('aiLocalBtn').addEventListener('click', () => {
         const title = val('f_title').toLowerCase();
         const desc  = val('f_description').toLowerCase();
         const text = title + " " + desc;
 
-        // naive keyword features
         const bigReach   = /onboard|signup|email|notification|search|feed|mobile|landing|ai assistant|automa|automation|import|export/.test(text);
         const infra      = /sdk|api|adapter|platform|infra|schema|pipeline|etl|migration|refactor|cache|index/.test(text);
         const analytics  = /analytics|dashboard|insight|metric|report|cohort|funnel|experiment|ab test/.test(text);
         const risk       = /privacy|security|trust|auth|gdpr|consent|pci|audit|bias|safety/.test(text);
         const newFlow    = /onboard|checkout|wizard|flow|journey|activation|retention/.test(text);
 
-        // suggest reach
         let reach = 200;
         if(bigReach) reach = 800;
         if(analytics) reach = Math.max(reach, 600);
-        if(infra) reach = Math.min(reach, 400); // infra often indirect
+        if(infra) reach = Math.min(reach, 400);
 
-        // suggest impact (3/2/1/0.5)
         let impact = 2;
         if(newFlow || bigReach) impact = 3;
         if(infra) impact = Math.min(impact, 2);
         if(/bug|fix|minor|copy/.test(text)) impact = 1;
 
-        // suggest effort (1..5)
         let effort = 2;
         if(infra || risk) effort = 3;
         if(/rewrite|migration|platform|data warehouse|real\-time/.test(text)) effort = 4;
         if(/mvp|prototype|quick|small/.test(text)) effort = 1;
 
-        // confidence
         let confidence = 0.8;
         if(/hypothesis|explore|spike|idea/.test(text)) confidence = 0.6;
         if(/validated|user research|beta|pilot|data shows/.test(text)) confidence = 1.0;
 
-        // push values into the form
         document.getElementById('f_reach').value = reach;
         document.getElementById('f_impact').value = String(impact);
         document.getElementById('f_effort').value = String(effort);
         document.getElementById('f_confidence').value = String(confidence);
+
+        const aiExplain = document.getElementById('aiExplain');
+        aiExplain.style.display = 'block';
+        aiExplain.innerHTML = `<strong>Estimate help:</strong> Based on the text, we suggested Reach ~${reach}, Impact ${impact}, Effort ${effort}, Confidence ${confidence}. Adjust as needed.`;
       });
+
+      // ---------- Ask AI via your endpoint (optional) ----------
+      const askBtn = document.getElementById('askAIBtn');
+      const aiNote = document.getElementById('aiNote');
+      if(!AI_KEY || !AI_ENDPOINT){
+        askBtn.style.display = 'none';
+      } else {
+        aiNote.style.display = 'none';
+      }
+
+      askBtn?.addEventListener('click', async () => {
+        const title = val('f_title').trim();
+        const description = val('f_description').trim();
+        if(!title || !description){ alert('Add a title and a one-liner first.'); return; }
+
+        askBtn.disabled = true;
+        askBtn.textContent = 'Thinking…';
+        try{
+          // Example payload; adapt to your LLM server contract.
+          const resp = await fetch(AI_ENDPOINT, {
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'Authorization': `Bearer ${AI_KEY}`
+            },
+            body: JSON.stringify({
+              title, description,
+              task: "estimate_rice_and_rationale"
+            })
+          });
+          if(!resp.ok) throw new Error('AI request failed');
+          const data = await resp.json();
+          // Expected shape (tweak as needed):
+          // { reach: 500, impact: 2, effort: 2, confidence: 0.8, rationale: "…" }
+          if(data.reach) document.getElementById('f_reach').value = data.reach;
+          if(data.impact) document.getElementById('f_impact').value = String(data.impact);
+          if(data.effort) document.getElementById('f_effort').value = String(data.effort);
+          if(data.confidence) document.getElementById('f_confidence').value = String(data.confidence);
+
+          const aiExplain = document.getElementById('aiExplain');
+          aiExplain.style.display = 'block';
+          aiExplain.innerHTML = `
+            <strong>Estimate help:</strong> ${escapeHtml(data.rationale || 'Suggested values based on similar projects.')}
+          `;
+        }catch(err){
+          alert('Could not reach your AI endpoint. Check AI_ENDPOINT / AI_API_KEY.');
+        }finally{
+          askBtn.disabled = false;
+          askBtn.textContent = 'Ask AI';
+        }
+      });
+
+      // ---------- Themes (clustering) ----------
+      function inferTheme(it){
+        const t = (it.title + ' ' + (it.description||'')).toLowerCase();
+        if(/onboard|signup|activation|first run|welcome|wizard/.test(t)) return 'Onboarding';
+        if(/growth|referral|vir(al|ality)|invite|share|conversion/.test(t)) return 'Growth';
+        if(/trust|privacy|security|consent|gdpr|auth|fraud|bias/.test(t)) return 'Trust';
+        if(/analytics|insight|dashboard|report|cohort|funnel/.test(t)) return 'Analytics';
+        if(/infra|platform|sdk|api|adapter|pipeline|etl|migration|refactor|cache|index/.test(t)) return 'Platform/Infra';
+        if(/billing|payment|checkout|invoice|subscription|stripe/.test(t)) return 'Monetisation';
+        return 'Other';
+      }
+
+      function showThemes(){
+        const groups = new Map();
+        for(const it of state.items){
+          const g = inferTheme(it);
+          if(!groups.has(g)) groups.set(g, []);
+          groups.get(g).push(it);
+        }
+        const out = [...groups.entries()].map(([name, arr])=>{
+          const list = arr.map(i=>`<li>${escapeHtml(i.title)} <span class="meta">(RICE ${riceScore(i)})</span></li>`).join('');
+          return `<div class="card"><strong>${escapeHtml(name)}</strong><div class="subtle">${arr.length} items</div><ul style="margin-left:18px;">${list}</ul></div>`;
+        }).join('');
+        const container = document.getElementById('themesOut');
+        container.innerHTML = out;
+        document.getElementById('themesSection').style.display = 'block';
+      }
+      document.getElementById('themesBtn').addEventListener('click', showThemes);
+
+      // ---------- Weekly narrative (3 bullets) ----------
+      function loadSnapshot(){
+        try{
+          return JSON.parse(localStorage.getItem(SNAP_KEY) || 'null');
+        }catch{ return null; }
+      }
+      function saveSnapshot(){
+        const snap = { ts: Date.now(), items: state.items.map(i => ({...i})) };
+        localStorage.setItem(SNAP_KEY, JSON.stringify(snap));
+      }
+      function summariseChanges(){
+        const snap = loadSnapshot();
+        const nowItems = state.items.map(i=>({title:i.title, quarter:i.quarter, hash: JSON.stringify({r:i.reach, i:i.impact, c:i.confidence, e:i.effort, d:i.description, deps:(i.dependsOn||[]).slice().sort()})}));
+        if(!snap){
+          saveSnapshot();
+          return ["First snapshot saved. Come back next week for a summary."];
+        }
+        const then = new Map(snap.items.map(i => [i.title, i]));
+        const now = new Map(nowItems.map(i => [i.title, i]));
+
+        const added = [...now.keys()].filter(k => !then.has(k));
+        const removed = [...then.keys()].filter(k => !now.has(k));
+        const changed = [...now.keys()].filter(k => then.has(k) && JSON.stringify(now.get(k).hash) !== JSON.stringify(JSON.stringify({r:then.get(k).reach,i:then.get(k).impact,c:then.get(k).confidence,e:then.get(k).effort,d:then.get(k).description,deps:(then.get(k).dependsOn||[]).slice().sort()})));
+
+        // Build three bullets (prioritise added -> changed -> removed)
+        const bullets = [];
+        if(added.length) bullets.push(`Added ${added.length} item${added.length>1?'s':''}: ${added.slice(0,3).join(', ')}${added.length>3?'…':''}.`);
+        if(changed.length) bullets.push(`Updated ${changed.length} item${changed.length>1?'s':''}: ${changed.slice(0,3).join(', ')}${changed.length>3?'…':''}.`);
+        if(removed.length) bullets.push(`Removed ${removed.length} item${removed.length>1?'s':''}: ${removed.slice(0,3).join(', ')}${removed.length>3?'…':''}.`);
+
+        if(!bullets.length) bullets.push('No material changes since last snapshot.');
+        // Refresh the snapshot to “this week”
+        saveSnapshot();
+        return bullets.slice(0,3);
+      }
+
+      function showWeekly(){
+        const bullets = summariseChanges();
+        const out = `<ul style="margin-left:18px">${bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
+        document.getElementById('weeklyOut').innerHTML = out;
+        document.getElementById('weeklySection').style.display = 'block';
+      }
+      document.getElementById('weeklyBtn').addEventListener('click', showWeekly);
 
       // ---------- Theme toggle ----------
       const rootEl = document.documentElement;
