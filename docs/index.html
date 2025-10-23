@@ -13,18 +13,14 @@
         --text: #0f0f13;
         --muted: #5a5a67;
         --border: #e7e9f0;
-        --accent1: #6C63FF;   /* brand purple */
-        --accent2: #74F0C1;   /* (used only for headings gradient) */
+        --accent1: #6C63FF;  /* purple */
         --shadow: 0 4px 16px rgba(0,0,0,0.04);
+
         --warn-bg: #fff6e5;
         --warn-text: #8a5b00;
         --warn-border: #ffd89e;
 
-        /* New: dark-purple gradient for primary buttons */
-        --grad-start: #3d2ae8;
-        --grad-end:   #6C63FF;
-
-        /* Chips (dependency suggestions) */
+        /* chips */
         --chip-bg: #f3f4f9;
         --chip-text: #2c2c35;
         --chip-border: #e3e6ef;
@@ -37,14 +33,11 @@
           --muted: #a3a3b5;
           --border: #24262e;
           --accent1: #8b82ff;
-          --accent2: #4de0b5;
           --shadow: 0 4px 20px rgba(0,0,0,0.5);
+
           --warn-bg: #2b210e;
           --warn-text: #ffd79a;
           --warn-border: #3a2b11;
-
-          --grad-start: #5c52ff;
-          --grad-end:   #8b82ff;
 
           --chip-bg: #1b1e2c;
           --chip-text: #e7e9f5;
@@ -80,25 +73,28 @@
         padding:8px 10px; border-radius:10px;
         box-shadow:none; cursor:pointer;
       }
-      .btn-ghost:hover{ box-shadow: 0 3px 10px rgba(0,0,0,.06); transform: translateY(0); }
+      .btn-ghost:hover{ box-shadow: 0 3px 10px rgba(0,0,0,.06); }
 
       .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
+      /* Headings: solid colour (no gradient) */
       h1 {
         display:flex; align-items:center; gap:8px;
         font-weight: 700;
         font-size: clamp(28px, 3vw, 38px);
-        background: linear-gradient(90deg, var(--accent1), var(--accent2));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--accent1);
         margin: 0 0 12px;
       }
+      h2 { color: var(--accent1); font-weight: 600; margin: 32px 0 12px; }
+
+      /* Count pill: grey */
       #count {
         font-size: 12px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: linear-gradient(90deg, var(--accent1), var(--accent2));
-        color: #fff;
+        background: #eef0f5;
+        color: #2b2e3a;
+        border: 1px solid #d9dce6;
         margin-left: 8px;
       }
 
@@ -129,6 +125,7 @@
         color: var(--text);
         outline: none;
         transition: border 0.2s ease, box-shadow 0.2s ease;
+        min-width: 0;
       }
       input:focus, select:focus, textarea:focus {
         box-shadow: none;
@@ -139,19 +136,19 @@
 
       .toolbar{ display:flex; gap:10px; margin-left:auto; flex-wrap:wrap; }
 
-      /* Primary buttons: DARK PURPLE GRADIENT */
+      /* Primary buttons: solid purple (no gradient) */
       .btn {
         border: none;
-        background: linear-gradient(135deg, var(--grad-start), var(--grad-end)) !important;
+        background: #6C63FF;
         color: white;
         font-weight: 600;
         border-radius: 10px;
         padding: 10px 16px;
         cursor: pointer;
-        box-shadow: 0 3px 12px rgba(76, 64, 238, .25);
+        box-shadow: 0 3px 12px rgba(108, 99, 255, .25);
         transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
       }
-      .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(76, 64, 238, .35); }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108, 99, 255, .35); }
       .btn:active { transform: translateY(0); }
       .btn[disabled]{ opacity:.6; cursor:not-allowed; }
 
@@ -181,6 +178,13 @@
         font-size: 12px;
         margin-left: 8px;
       }
+      @media (prefers-color-scheme: dark){
+        .pill{
+          background:#1d2030 !important;
+          color:#e7e9f5 !important;
+          border-color:#2a2f45 !important;
+        }
+      }
 
       .meta { font-size: 13px; color: var(--muted); margin-top: 6px; word-break: break-word; }
       .score { font-weight: 700; color: var(--accent1); }
@@ -195,16 +199,7 @@
         font-size:12px;
       }
 
-      .section { margin-top: 40px; }
-      h2 {
-        font-weight: 600;
-        margin-bottom: 12px;
-        background: linear-gradient(90deg, var(--accent1), var(--accent2));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      /* Add project form tidy */
+      /* Add project form */
       .form {
         background: var(--card);
         border: 1px solid var(--border);
@@ -215,11 +210,7 @@
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         box-shadow: var(--shadow);
       }
-      .form label{
-        display: grid;
-        gap: 6px;
-        align-content: start;
-      }
+      .form label{ display: grid; gap: 6px; align-content: start; }
       .form textarea{ min-height: 80px; resize: vertical; }
       .help { font-size: 13px; color: var(--muted); margin: 8px 0 16px; }
 
@@ -247,19 +238,9 @@
       }
       .plan-results{ margin-top:12px; font-size:14px; }
       .plan-results ul{ margin:8px 0 0 18px; }
-
-      /* Dark-mode parity extras */
-      @media (prefers-color-scheme: dark){
-        .pill{
-          background: #1d2030 !important;
-          color: #e7e9f5 !important;
-          border-color:#2a2f45 !important;
-        }
-      }
     </style>
 
-    <!-- Optional: expose AI config during local testing (remove in production) -->
-    <!--
+    <!-- Optional dev config: remove in production
     <script>
       window.AI_API_KEY = "YOUR_KEY";
       window.AI_ENDPOINT = "https://your-llm-endpoint.example/rice";
@@ -270,13 +251,7 @@
     <header class="topbar">
       <div class="brand">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <defs>
-            <linearGradient id="g" x1="0" x2="1">
-              <stop offset="0" stop-color="var(--accent1)"/>
-              <stop offset="1" stop-color="var(--accent2)"/>
-            </linearGradient>
-          </defs>
-          <path fill="url(#g)" d="M12 2l1.9 4.8L19 8l-4.7 2 1.7 5.1L12 12.8 8 15.1 9.7 10 5 8l5.1-1.2L12 2z"/>
+          <path fill="currentColor" d="M12 2l1.9 4.8L19 8l-4.7 2 1.7 5.1L12 12.8 8 15.1 9.7 10 5 8l5.1-1.2L12 2z"/>
         </svg>
         <span>Roadmap Visualiser</span>
       </div>
@@ -407,16 +382,6 @@
         <div id="aiExplain" class="help" style="grid-column:1/-1; display:none;"></div>
       </div>
 
-      <div class="section">
-        <h3>Scoring guide</h3>
-        <div class="help">
-          <strong>RICE = (Reach × Impact × Confidence) / Effort</strong><br/>
-          Impact: 3 Huge, 2 Medium, 1 Small, 0.5 Very minor, 0.25 Minimal<br/>
-          Effort: 1 ≈ 1 week, 2 ≈ 2–3 weeks, 3 ≈ 1 month, 4 ≈ 1–2 months, 5 ≈ 2+ months<br/>
-          Confidence: 1.0 strong data, 0.8 fairly confident, 0.6 moderate, 0.4 low
-        </div>
-      </div>
-
       <div id="themesSection" class="section" style="display:none;">
         <h2>Themes (auto)</h2>
         <div id="themesOut" class="grid"></div>
@@ -428,23 +393,27 @@
       </div>
     </div>
 
+    <!-- Dev only: set your key/endpoint to enable Ask AI
     <script>
-      // ---------- Optional AI config pulled from window (set in a small inline script) ----------
+      window.AI_API_KEY = "your-dev-key";
+      window.AI_ENDPOINT = "https://your-endpoint.example/rice";
+    </script>
+    -->
+
+    <script>
       const AI_KEY = window.AI_API_KEY || null;
       const AI_ENDPOINT = window.AI_ENDPOINT || null;
 
-      // ---------- State & utils ----------
       const state = { items: [], quarter: "", sortBy: "rice", search: "" };
       const LS_KEY = "roadmap_custom_items_v1";
       const THEME_KEY = "rv_theme";
-      const SNAP_KEY = "rv_snapshot_v1"; // for weekly summary
+      const SNAP_KEY = "rv_snapshot_v1";
 
       function riceScore(i){ return Math.round((i.reach * i.impact * i.confidence) / Math.max(1, i.effort)); }
       function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
       function val(id){ return document.getElementById(id).value; }
       function num(id){ return parseFloat(val(id) || '0'); }
 
-      // ---------- Load ----------
       async function load() {
         const res = await fetch('data.json', {cache:'no-store'});
         const base = await res.json();
@@ -454,14 +423,9 @@
         refreshDepSuggestions();
       }
 
-      // ---------- Render ----------
       function render(){
         const q = state.quarter, s = state.sortBy, term = state.search.toLowerCase();
-
-        let filtered = state.items.filter(i =>
-          (!q || i.quarter === q) &&
-          i.title.toLowerCase().includes(term)
-        );
+        let filtered = state.items.filter(i => (!q || i.quarter === q) && i.title.toLowerCase().includes(term));
 
         filtered.sort((a,b)=>{
           if(s==="impact") return (b.impact - a.impact);
@@ -471,17 +435,12 @@
 
         document.getElementById('count').textContent = filtered.length + " items";
 
-        // Map of title -> item for dependency checks
         const byTitle = new Map(state.items.map(i => [i.title.trim().toLowerCase(), i]));
-
         document.getElementById('grid').innerHTML = filtered.map(i=>{
           const deps = (i.dependsOn || []).filter(Boolean);
           const missing = deps.filter(d => !byTitle.has(d.trim().toLowerCase()));
-          const depsHtml = deps.length
-            ? `<div class="meta">Dependencies: ${deps.map(escapeHtml).join(', ')}</div>` : '';
-
-          const warnHtml = missing.length
-            ? `<div class="warn">Missing dependency: ${missing.map(escapeHtml).join(', ')}</div>` : '';
+          const depsHtml = deps.length ? `<div class="meta">Dependencies: ${deps.map(escapeHtml).join(', ')}</div>` : '';
+          const warnHtml = missing.length ? `<div class="warn">Missing dependency: ${missing.map(escapeHtml).join(', ')}</div>` : '';
 
           return `
           <div class="card">
@@ -496,13 +455,11 @@
         }).join('');
       }
 
-      // ---------- Dependency suggestions UI ----------
+      // Dependency suggestions
       const depInput = document.getElementById('f_depends');
       const depSuggest = document.getElementById('dep_suggest');
 
-      function tokeniseDeps(){
-        return depInput.value.split(',').map(s => s.trim()).filter(Boolean);
-      }
+      function tokeniseDeps(){ return depInput.value.split(',').map(s => s.trim()).filter(Boolean); }
       function currentDepQuery(){
         const raw = depInput.value;
         const lastComma = raw.lastIndexOf(',');
@@ -512,13 +469,11 @@
       function refreshDepSuggestions(){
         const query = currentDepQuery();
         const chosen = new Set(tokeniseDeps().map(s => s.toLowerCase()));
-
         const options = state.items
           .map(i => i.title)
           .filter(t => t && !chosen.has(t.toLowerCase()))
           .filter(t => !query || t.toLowerCase().includes(query))
           .slice(0, 12);
-
         depSuggest.innerHTML = options.map(t => `<button type="button" class="chip" data-title="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
       }
       depInput.addEventListener('input', refreshDepSuggestions);
@@ -532,12 +487,12 @@
         refreshDepSuggestions();
       });
 
-      // ---------- Filters ----------
+      // Filters
       document.getElementById('quarterFilter').addEventListener('change', e => { state.quarter = e.target.value; render(); });
       document.getElementById('sortBy').addEventListener('change', e => { state.sortBy = e.target.value; render(); });
       document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
 
-      // ---------- Add item ----------
+      // Add item
       document.getElementById('addBtn').addEventListener('click', () => {
         const item = {
           title: val('f_title').trim(),
@@ -566,7 +521,7 @@
         window.scrollTo({top:0, behavior:'smooth'});
       });
 
-      // ---------- Download JSON ----------
+      // Download / Reset
       document.getElementById('downloadBtn').addEventListener('click', () => {
         const blob = new Blob([JSON.stringify(state.items, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
@@ -575,8 +530,6 @@
         a.click();
         URL.revokeObjectURL(a.href);
       });
-
-      // ---------- Reset local ----------
       document.getElementById('resetLocalBtn').addEventListener('click', () => {
         if(confirm('Clear your locally added projects?')) {
           localStorage.removeItem(LS_KEY);
@@ -584,18 +537,16 @@
         }
       });
 
-      // ---------- Capacity planner (0/1 knapsack with simple dependency respect) ----------
+      // Capacity planner
       document.getElementById('planBtn').addEventListener('click', () => {
         const q = val('planQuarter');
         const cap = Math.max(0, parseFloat(val('planCapacity') || '0'));
         const items = state.items.filter(i => i.quarter === q);
-        if(items.length === 0){ document.getElementById('planOut').innerHTML = '<div class="help">No items for that quarter.</div>'; return; }
-
-        // Build index
+        if(items.length === 0){
+          document.getElementById('planOut').innerHTML = '<div class="help">No items for that quarter.</div>'; return;
+        }
         const idx = new Map(items.map((it, k) => [it.title.trim().toLowerCase(), k]));
-
-        const n = items.length;
-        const W = Math.floor(cap);
+        const n = items.length, W = Math.floor(cap);
         const dp = Array.from({length:n+1}, ()=>Array(W+1).fill(0));
         for(let i=1;i<=n;i++){
           const it = items[i-1];
@@ -603,12 +554,9 @@
           const v = riceScore(it);
           for(let wgt=0; wgt<=W; wgt++){
             dp[i][wgt] = dp[i-1][wgt];
-            if(w>0 && w<=wgt){
-              dp[i][wgt] = Math.max(dp[i][wgt], dp[i-1][wgt-w] + v);
-            }
+            if(w>0 && w<=wgt) dp[i][wgt] = Math.max(dp[i][wgt], dp[i-1][wgt-w] + v);
           }
         }
-        // Backtrack
         let wgt=W; const chosen=[];
         for(let i=n;i>=1;i--){
           if(dp[i][wgt]!==dp[i-1][wgt]){
@@ -619,7 +567,6 @@
         }
         chosen.reverse();
 
-        // Ensure dependencies
         const chosenSet = new Set(chosen.map(i=>i.title.trim().toLowerCase()));
         let addedDeps = [];
         for(const it of [...chosen]){
@@ -630,10 +577,7 @@
               const dep = items[idx.get(key)];
               const e = Math.max(0, Math.floor(dep.effort||0));
               if(wgt - e >= 0){
-                chosen.push(dep);
-                chosenSet.add(key);
-                wgt -= e;
-                addedDeps.push(dep.title);
+                chosen.push(dep); chosenSet.add(key); wgt -= e; addedDeps.push(dep.title);
               }
             }
           }
@@ -648,19 +592,12 @@
           <div class="help">Selected ${chosen.length} items (effort ${totalEffort.toFixed(1)}, RICE total ${totalRICE}).</div>
           ${addedDeps.length ? `<div class="help">Included dependencies: ${addedDeps.map(escapeHtml).join(', ')}</div>` : ''}
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
-            <div>
-              <strong>✅ Fits</strong>
-              <ul>${chosen.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul>
-            </div>
-            <div>
-              <strong>⏭ Overflow</strong>
-              <ul>${overflow.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul>
-            </div>
-          </div>
-        `;
+            <div><strong>✅ Fits</strong><ul>${chosen.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul></div>
+            <div><strong>⏭ Overflow</strong><ul>${overflow.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul></div>
+          </div>`;
       });
 
-      // ---------- Local quick scoring (no API) ----------
+      // Local quick scoring
       document.getElementById('aiLocalBtn').addEventListener('click', () => {
         const title = val('f_title').toLowerCase();
         const desc  = val('f_description').toLowerCase();
@@ -672,24 +609,10 @@
         const risk       = /privacy|security|trust|auth|gdpr|consent|pci|audit|bias|safety/.test(text);
         const newFlow    = /onboard|checkout|wizard|flow|journey|activation|retention/.test(text);
 
-        let reach = 200;
-        if(bigReach) reach = 800;
-        if(analytics) reach = Math.max(reach, 600);
-        if(infra) reach = Math.min(reach, 400);
-
-        let impact = 2;
-        if(newFlow || bigReach) impact = 3;
-        if(infra) impact = Math.min(impact, 2);
-        if(/bug|fix|minor|copy/.test(text)) impact = 1;
-
-        let effort = 2;
-        if(infra || risk) effort = 3;
-        if(/rewrite|migration|platform|data warehouse|real\-time/.test(text)) effort = 4;
-        if(/mvp|prototype|quick|small/.test(text)) effort = 1;
-
-        let confidence = 0.8;
-        if(/hypothesis|explore|spike|idea/.test(text)) confidence = 0.6;
-        if(/validated|user research|beta|pilot|data shows/.test(text)) confidence = 1.0;
+        let reach = 200; if(bigReach) reach = 800; if(analytics) reach = Math.max(reach, 600); if(infra) reach = Math.min(reach, 400);
+        let impact = 2; if(newFlow || bigReach) impact = 3; if(infra) impact = Math.min(impact, 2); if(/bug|fix|minor|copy/.test(text)) impact = 1;
+        let effort = 2; if(infra || risk) effort = 3; if(/rewrite|migration|platform|data warehouse|real\-time/.test(text)) effort = 4; if(/mvp|prototype|quick|small/.test(text)) effort = 1;
+        let confidence = 0.8; if(/hypothesis|explore|spike|idea/.test(text)) confidence = 0.6; if(/validated|user research|beta|pilot|data shows/.test(text)) confidence = 1.0;
 
         document.getElementById('f_reach').value = reach;
         document.getElementById('f_impact').value = String(impact);
@@ -698,57 +621,41 @@
 
         const aiExplain = document.getElementById('aiExplain');
         aiExplain.style.display = 'block';
-        aiExplain.innerHTML = `<strong>Estimate help:</strong> Based on the text, we suggested Reach ~${reach}, Impact ${impact}, Effort ${effort}, Confidence ${confidence}. Adjust as needed.`;
+        aiExplain.innerHTML = `<strong>Estimate help:</strong> Reach ~${reach}, Impact ${impact}, Effort ${effort}, Confidence ${confidence}. Adjust as needed.`;
       });
 
-      // ---------- Ask AI via your endpoint (optional) ----------
+      // Ask AI (optional)
       const askBtn = document.getElementById('askAIBtn');
       const aiNote = document.getElementById('aiNote');
-      if(!AI_KEY || !AI_ENDPOINT){
-        askBtn.style.display = 'none';
-      } else {
-        aiNote.style.display = 'none';
-      }
-
+      if(!AI_KEY || !AI_ENDPOINT){ askBtn.style.display = 'none'; } else { aiNote.style.display = 'none'; }
       askBtn?.addEventListener('click', async () => {
         const title = val('f_title').trim();
         const description = val('f_description').trim();
         if(!title || !description){ alert('Add a title and a one-liner first.'); return; }
-
-        askBtn.disabled = true;
-        askBtn.textContent = 'Thinking…';
+        askBtn.disabled = true; askBtn.textContent = 'Thinking…';
         try{
           const resp = await fetch(AI_ENDPOINT, {
             method:'POST',
-            headers:{
-              'Content-Type':'application/json',
-              'Authorization': `Bearer ${AI_KEY}`
-            },
-            body: JSON.stringify({
-              title, description,
-              task: "estimate_rice_and_rationale"
-            })
+            headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${AI_KEY}` },
+            body: JSON.stringify({ title, description, task: "estimate_rice_and_rationale" })
           });
           if(!resp.ok) throw new Error('AI request failed');
           const data = await resp.json();
-
           if(data.reach) document.getElementById('f_reach').value = data.reach;
           if(data.impact) document.getElementById('f_impact').value = String(data.impact);
           if(data.effort) document.getElementById('f_effort').value = String(data.effort);
           if(data.confidence) document.getElementById('f_confidence').value = String(data.confidence);
-
           const aiExplain = document.getElementById('aiExplain');
           aiExplain.style.display = 'block';
           aiExplain.innerHTML = `<strong>Estimate help:</strong> ${escapeHtml(data.rationale || 'Suggested values based on similar projects.')}`;
         }catch(err){
           alert('Could not reach your AI endpoint. Check AI_ENDPOINT / AI_API_KEY.');
         }finally{
-          askBtn.disabled = false;
-          askBtn.textContent = 'Ask AI';
+          askBtn.disabled = false; askBtn.textContent = 'Ask AI';
         }
       });
 
-      // ---------- Themes (clustering) ----------
+      // Themes (clustering)
       function inferTheme(it){
         const t = (it.title + ' ' + (it.description||'')).toLowerCase();
         if(/onboard|signup|activation|first run|welcome|wizard/.test(t)) return 'Onboarding';
@@ -759,8 +666,8 @@
         if(/billing|payment|checkout|invoice|subscription|stripe/.test(t)) return 'Monetisation';
         return 'Other';
       }
-
       function showThemes(){
+        if(!state.items.length){ alert('No items loaded yet.'); return; }
         const groups = new Map();
         for(const it of state.items){
           const g = inferTheme(it);
@@ -769,33 +676,25 @@
         }
         const out = [...groups.entries()].map(([name, arr])=>{
           const list = arr.map(i=>`<li>${escapeHtml(i.title)} <span class="meta">(RICE ${riceScore(i)})</span></li>`).join('');
-          return `<div class="card"><strong>${escapeHtml(name)}</strong><div class="meta">${arr.length} items</div><ul style="margin-left:18px;">${list}</ul></div>`;
+          return `<div class="card"><strong>${escapeHtml(name)}</strong><div class="meta">${arr.length} item${arr.length>1?'s':''}</div><ul style="margin-left:18px;">${list}</ul></div>`;
         }).join('');
-        const container = document.getElementById('themesOut');
-        container.innerHTML = out;
-        document.getElementById('themesSection').style.display = 'block';
+        const section = document.getElementById('themesSection');
+        document.getElementById('themesOut').innerHTML = out || '<div class="help">No items to cluster.</div>';
+        section.style.display = 'block';
+        section.scrollIntoView({behavior:'smooth', block:'start'});
       }
       document.getElementById('themesBtn').addEventListener('click', showThemes);
 
-      // ---------- Weekly narrative (3 bullets) ----------
-      function loadSnapshot(){
-        try{ return JSON.parse(localStorage.getItem(SNAP_KEY) || 'null'); }catch{ return null; }
-      }
-      function saveSnapshot(){
-        const snap = { ts: Date.now(), items: state.items.map(i => ({...i})) };
-        localStorage.setItem(SNAP_KEY, JSON.stringify(snap));
-      }
+      // Weekly narrative (3 bullets)
+      function loadSnapshot(){ try{ return JSON.parse(localStorage.getItem(SNAP_KEY) || 'null'); }catch{ return null; } }
+      function saveSnapshot(){ const snap = { ts: Date.now(), items: state.items.map(i => ({...i})) }; localStorage.setItem(SNAP_KEY, JSON.stringify(snap)); }
       function summariseChanges(){
         const snap = loadSnapshot();
+        if(!snap){ saveSnapshot(); return ["Saved a baseline. Come back later and click again for changes."]; }
         const nowItems = state.items.map(i=>({title:i.title, quarter:i.quarter, hash: JSON.stringify({r:i.reach, i:i.impact, c:i.confidence, e:i.effort, d:i.description, deps:(i.dependsOn||[]).slice().sort()})}));
-        if(!snap){
-          saveSnapshot();
-          return ["First snapshot saved. Come back next week for a summary."];
-        }
         const then = new Map(snap.items.map(i => [i.title, i]));
-        const now = new Map(nowItems.map(i => [i.title, i]));
-
-        const added = [...now.keys()].filter(k => !then.has(k));
+        const now  = new Map(nowItems.map(i => [i.title, i]));
+        const added   = [...now.keys()].filter(k => !then.has(k));
         const removed = [...then.keys()].filter(k => !now.has(k));
         const changed = [...now.keys()].filter(k => {
           if(!then.has(k)) return false;
@@ -803,38 +702,33 @@
           const prevHash = JSON.stringify({r:prev.reach,i:prev.impact,c:prev.confidence,e:prev.effort,d:prev.description,deps:(prev.dependsOn||[]).slice().sort()});
           return JSON.stringify(now.get(k).hash) !== JSON.stringify(prevHash);
         });
-
         const bullets = [];
-        if(added.length) bullets.push(`Added ${added.length} item${added.length>1?'s':''}: ${added.slice(0,3).join(', ')}${added.length>3?'…':''}.`);
-        if(changed.length) bullets.push(`Updated ${changed.length} item${changed.length>1?'s':''}: ${changed.slice(0,3).join(', ')}${changed.length>3?'…':''}.`);
-        if(removed.length) bullets.push(`Removed ${removed.length} item${removed.length>1?'s':''}: ${removed.slice(0,3).join(', ')}${removed.length>3?'…':''}.`);
-
+        if(added.length)   bullets.push(`Added ${added.length}: ${added.slice(0,3).join(', ')}${added.length>3?'…':''}.`);
+        if(changed.length) bullets.push(`Updated ${changed.length}: ${changed.slice(0,3).join(', ')}${changed.length>3?'…':''}.`);
+        if(removed.length) bullets.push(`Removed ${removed.length}: ${removed.slice(0,3).join(', ')}${removed.length>3?'…':''}.`);
         if(!bullets.length) bullets.push('No material changes since last snapshot.');
         saveSnapshot();
         return bullets.slice(0,3);
       }
-
       function showWeekly(){
+        const section = document.getElementById('weeklySection');
         const bullets = summariseChanges();
-        const out = `<ul style="margin-left:18px">${bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
-        document.getElementById('weeklyOut').innerHTML = out;
-        document.getElementById('weeklySection').style.display = 'block';
+        document.getElementById('weeklyOut').innerHTML = `<ul style="margin-left:18px">${bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
+        section.style.display = 'block';
+        section.scrollIntoView({behavior:'smooth', block:'start'});
       }
       document.getElementById('weeklyBtn').addEventListener('click', showWeekly);
 
-      // ---------- Theme toggle ----------
+      // Theme toggle
       const rootEl = document.documentElement;
       const btnToggle = document.getElementById("themeToggle");
       const icon = document.getElementById("themeIcon");
       const label = document.getElementById("themeLabel");
 
       function applySavedTheme(){
-        const saved = localStorage.getItem(THEME_KEY); // "light" | "dark" | null
-        if(saved === "light" || saved === "dark"){
-          rootEl.setAttribute("data-theme", saved);
-        } else {
-          rootEl.removeAttribute("data-theme"); // follow system
-        }
+        const saved = localStorage.getItem(THEME_KEY);
+        if(saved === "light" || saved === "dark"){ rootEl.setAttribute("data-theme", saved); }
+        else { rootEl.removeAttribute("data-theme"); }
         updateToggleVisuals();
       }
       function toggleTheme(){
