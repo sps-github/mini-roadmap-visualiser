@@ -238,6 +238,22 @@
       }
       .plan-results{ margin-top:12px; font-size:14px; }
       .plan-results ul{ margin:8px 0 0 18px; }
+/* Tabs */
+.tabs { display:flex; gap:8px; align-items:center; }
+.tab{
+  appearance:none; border:1px solid var(--border); background: var(--card);
+  color: var(--text); padding:8px 14px; border-radius:10px; cursor:pointer;
+}
+.tab.is-active{
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 2px rgba(108,99,255,.15) inset;
+}
+.helper-panels{ margin-top:10px; }
+.helper-panel{ display:none; }
+.helper-panel.is-active{ display:block; }
+
+/* Small status line in AI panel */
+.muted { color: var(--muted); font-size: 13px; }
     </style>
 
     <!-- Optional dev config: remove in production
@@ -372,14 +388,33 @@
           <textarea id="f_description" placeholder="One-liner scope / why it matters"></textarea>
         </label>
 
-        <div class="row" style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <button class="btn" id="addBtn">Add</button>
-          <button class="btn-ghost" id="aiLocalBtn" type="button" title="Heuristic score from title/description (no API)">Quick score</button>
-          <button class="btn-ghost" id="askAIBtn" type="button" title="Use your LLM endpoint to suggest ranges">Ask AI</button>
-          <span id="aiNote" class="help" style="margin:0;">Ask AI is hidden without an <code>AI_API_KEY</code>.</span>
-        </div>
+        <div class="row" style="grid-column:1/-1; display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+  <button class="btn" id="addBtn">Add</button>
 
-        <div id="aiExplain" class="help" style="grid-column:1/-1; display:none;"></div>
+  <div class="tabs" role="tablist" aria-label="Assistants">
+    <button class="tab is-active" id="tab-quick" role="tab" aria-controls="panel-quick" aria-selected="true">Quick score</button>
+    <button class="tab" id="tab-ask" role="tab" aria-controls="panel-ask" aria-selected="false">Ask AI</button>
+  </div>
+</div>
+
+<div class="helper-panels" style="grid-column:1/-1">
+  <!-- Quick score panel -->
+  <div class="helper-panel is-active" id="panel-quick" role="tabpanel" aria-labelledby="tab-quick">
+    <p class="muted">Estimate help (offline): Given title + one-liner, suggest Reach/Impact/Effort and Confidence.</p>
+    <button class="btn-ghost" id="aiLocalBtn" type="button">Run quick score</button>
+    <div id="aiExplain" class="help" style="display:none;"></div>
+  </div>
+
+  <!-- Ask AI panel -->
+  <div class="helper-panel" id="panel-ask" role="tabpanel" aria-labelledby="tab-ask">
+    <p class="muted" id="aiSetupNote">Use your LLM to suggest ranges + a short rationale.</p>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button class="btn-ghost" id="askRunBtn" type="button">Ask AI now</button>
+      <span id="askStatus" class="muted"></span>
+    </div>
+    <div id="askRationale" class="help" style="display:none;"></div>
+  </div>
+</div>
       </div>
 
       <div id="themesSection" class="section" style="display:none;">
@@ -393,12 +428,11 @@
       </div>
     </div>
 
-    <!-- Dev only: set your key/endpoint to enable Ask AI
-    <script>
-      window.AI_API_KEY = "your-dev-key";
-      window.AI_ENDPOINT = "https://your-endpoint.example/rice";
-    </script>
-    -->
+Dev only: set your key/endpoint to enable Ask AI -->
+<script>
+  window.AI_API_KEY = "your-real-key";
+  window.AI_ENDPOINT = "https://your-endpoint.example/rice";
+</script>
 
     <script>
       const AI_KEY = window.AI_API_KEY || null;
@@ -596,6 +630,23 @@
             <div><strong>⏭ Overflow</strong><ul>${overflow.map(i=>`<li>${escapeHtml(i.title)} <span style="color:var(--muted)">(E${i.effort}, R${riceScore(i)})</span></li>`).join('')}</ul></div>
           </div>`;
       });
+// ----- Tabs (Quick score / Ask AI) -----
+const tabQuick = document.getElementById('tab-quick');
+const tabAsk   = document.getElementById('tab-ask');
+const panelQuick = document.getElementById('panel-quick');
+const panelAsk   = document.getElementById('panel-ask');
+
+function activateTab(which){
+  const isAsk = which === 'ask';
+  tabQuick.classList.toggle('is-active', !isAsk);
+  tabAsk.classList.toggle('is-active', isAsk);
+  tabQuick.setAttribute('aria-selected', String(!isAsk));
+  tabAsk.setAttribute('aria-selected', String(isAsk));
+  panelQuick.classList.toggle('is-active', !isAsk);
+  panelAsk.classList.toggle('is-active', isAsk);
+}
+tabQuick.addEventListener('click', ()=>activateTab('quick'));
+tabAsk.addEventListener('click',   ()=>activateTab('ask'));
 
       // Local quick scoring
       document.getElementById('aiLocalBtn').addEventListener('click', () => {
@@ -624,36 +675,57 @@
         aiExplain.innerHTML = `<strong>Estimate help:</strong> Reach ~${reach}, Impact ${impact}, Effort ${effort}, Confidence ${confidence}. Adjust as needed.`;
       });
 
-      // Ask AI (optional)
-      const askBtn = document.getElementById('askAIBtn');
-      const aiNote = document.getElementById('aiNote');
-      if(!AI_KEY || !AI_ENDPOINT){ askBtn.style.display = 'none'; } else { aiNote.style.display = 'none'; }
-      askBtn?.addEventListener('click', async () => {
-        const title = val('f_title').trim();
-        const description = val('f_description').trim();
-        if(!title || !description){ alert('Add a title and a one-liner first.'); return; }
-        askBtn.disabled = true; askBtn.textContent = 'Thinking…';
-        try{
-          const resp = await fetch(AI_ENDPOINT, {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${AI_KEY}` },
-            body: JSON.stringify({ title, description, task: "estimate_rice_and_rationale" })
-          });
-          if(!resp.ok) throw new Error('AI request failed');
-          const data = await resp.json();
-          if(data.reach) document.getElementById('f_reach').value = data.reach;
-          if(data.impact) document.getElementById('f_impact').value = String(data.impact);
-          if(data.effort) document.getElementById('f_effort').value = String(data.effort);
-          if(data.confidence) document.getElementById('f_confidence').value = String(data.confidence);
-          const aiExplain = document.getElementById('aiExplain');
-          aiExplain.style.display = 'block';
-          aiExplain.innerHTML = `<strong>Estimate help:</strong> ${escapeHtml(data.rationale || 'Suggested values based on similar projects.')}`;
-        }catch(err){
-          alert('Could not reach your AI endpoint. Check AI_ENDPOINT / AI_API_KEY.');
-        }finally{
-          askBtn.disabled = false; askBtn.textContent = 'Ask AI';
-        }
-      });
+// ----- Ask AI (tabbed) -----
+const askRunBtn   = document.getElementById('askRunBtn');
+const askStatus   = document.getElementById('askStatus');
+const askRationale= document.getElementById('askRationale');
+const aiSetupNote = document.getElementById('aiSetupNote');
+
+const AI_CONFIGURED = !!(window.AI_API_KEY && window.AI_ENDPOINT);
+if(!AI_CONFIGURED){
+  askRunBtn.disabled = true;
+  askStatus.textContent = 'Set AI_API_KEY and AI_ENDPOINT to enable.';
+} else {
+  aiSetupNote.textContent = 'Connected. Ask AI will pre-fill estimates and a short rationale.';
+}
+
+askRunBtn.addEventListener('click', async () => {
+  const title = document.getElementById('f_title').value.trim();
+  const description = document.getElementById('f_description').value.trim();
+  if(!title || !description){ 
+    alert('Add a title and a one-liner first.'); 
+    return; 
+  }
+
+  askRunBtn.disabled = true; 
+  askStatus.textContent = 'Thinking…';
+  try{
+    const resp = await fetch(window.AI_ENDPOINT, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${window.AI_API_KEY}`
+      },
+      body: JSON.stringify({ title, description, task: 'estimate_rice_and_rationale' })
+    });
+    if(!resp.ok) throw new Error('AI request failed');
+    const data = await resp.json();
+
+    if(data.reach)      document.getElementById('f_reach').value = data.reach;
+    if(data.impact)     document.getElementById('f_impact').value = String(data.impact);
+    if(data.effort)     document.getElementById('f_effort').value = String(data.effort);
+    if(data.confidence) document.getElementById('f_confidence').value = String(data.confidence);
+
+    askRationale.style.display = 'block';
+    askRationale.innerHTML = `<strong>Estimate help (AI):</strong> ${escapeHtml(data.rationale || 'Suggested values based on similar projects.')}`;
+    askStatus.textContent = 'Done.';
+  }catch(err){
+    askStatus.textContent = 'Error contacting AI endpoint.';
+    alert('Could not reach your AI endpoint. Check AI_ENDPOINT / AI_API_KEY.');
+  }finally{
+    askRunBtn.disabled = false;
+  }
+});
 
       // Themes (clustering)
       function inferTheme(it){
