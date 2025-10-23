@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roadmap Visualiser</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+      h1 { margin: 0 0 1rem; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+      .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 12px; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eee; margin-left: 8px; font-size: 12px; }
+      .meta { font-size: 12px; color: #555; margin-top: 6px; }
+      .score { font-weight: bold; }
+      .controls { margin: 12px 0 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+      label { font-size: 14px; }
+      input, select { padding: 6px 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Roadmap Visualiser <span class="pill" id="count"></span></h1>
+    <div class="controls">
+      <label>Quarter:
+        <select id="quarterFilter">
+          <option value="">All</option>
+          <option>2025 Q1</option>
+          <option>2025 Q2</option>
+          <option>2025 Q3</option>
+          <option>2025 Q4</option>
+        </select>
+      </label>
+      <label>Sort by:
+        <select id="sortBy">
+          <option value="rice">RICE (desc)</option>
+          <option value="impact">Impact (desc)</option>
+          <option value="effort">Effort (asc)</option>
+        </select>
+      </label>
+      <label>Search:
+        <input id="search" placeholder="Search titles…"/>
+      </label>
+    </div>
+    <div class="grid" id="grid"></div>
+    <script>
+      const state = { items: [], quarter: "", sortBy: "rice", search: "" };
+
+      async function load() {
+        const res = await fetch('data.json');
+        state.items = await res.json();
+        render();
+      }
+
+      function riceScore(i){ return Math.round((i.reach * i.impact * i.confidence) / Math.max(1, i.effort)); }
+
+      function render(){
+        const q = state.quarter, s = state.sortBy, term = state.search.toLowerCase();
+        let filtered = state.items.filter(i => (!q || i.quarter === q) && i.title.toLowerCase().includes(term));
+        filtered.sort((a,b)=>{
+          if(s==="impact") return (b.impact - a.impact);
+          if(s==="effort") return (a.effort - b.effort);
+          return (riceScore(b) - riceScore(a));
+        });
+        document.getElementById('count').textContent = filtered.length + " items";
+        const grid = document.getElementById('grid');
+        grid.innerHTML = filtered.map(i=>`
+          <div class="card">
+            <div><strong>${i.title}</strong> <span class="pill">${i.quarter}</span></div>
+            <div class="meta">Owner: ${i.owner || '—'} | Team: ${i.team || '—'}</div>
+            <div class="meta">Reach ${i.reach}, Impact ${i.impact}, Confidence ${i.confidence}, Effort ${i.effort}</div>
+            <div class="meta score">RICE: ${riceScore(i)}</div>
+            <p>${i.description || ''}</p>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('quarterFilter').addEventListener('change', e => { state.quarter = e.target.value; render(); });
+      document.getElementById('sortBy').addEventListener('change', e => { state.sortBy = e.target.value; render(); });
+      document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
+
+      load();
+    </script>
+  </body>
+</html>

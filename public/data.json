@@ -1,0 +1,46 @@
+[
+  {
+    "title": "Interview transcription MVP",
+    "quarter": "2025 Q1",
+    "reach": 500,
+    "impact": 3,
+    "confidence": 0.8,
+    "effort": 2,
+    "owner": "Sarah",
+    "team": "Core",
+    "description": "Stream live audio to vendor; basic UI"
+  },
+  {
+    "title": "Bias audit v1",
+    "quarter": "2025 Q2",
+    "reach": 300,
+    "impact": 3,
+    "confidence": 0.7,
+    "effort": 3,
+    "owner": "Sarah",
+    "team": "Trust",
+    "description": "Simple score card + flags"
+  },
+  {
+    "title": "SDK adapter layer",
+    "quarter": "2025 Q1",
+    "reach": 400,
+    "impact": 2,
+    "confidence": 0.9,
+    "effort": 2,
+    "owner": "Sarah",
+    "team": "Platform",
+    "description": "Abstract vendor SDKs behind interface"
+  },
+  {
+    "title": "Insights dashboard",
+    "quarter": "2025 Q3",
+    "reach": 600,
+    "impact": 3,
+    "confidence": 0.7,
+    "effort": 4,
+    "owner": "Sarah",
+    "team": "Data",
+    "description": "Activation/retention metrics for interviews"
+  }
+]
