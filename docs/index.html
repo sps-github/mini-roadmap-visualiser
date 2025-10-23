@@ -1,24 +1,44 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Roadmap Visualiser</title>
     <style>
+      :root { --border:#e5e5e5; --muted:#555; --pill:#eee; }
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
       h1 { margin: 0 0 1rem; }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-      .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 12px; }
-      .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eee; margin-left: 8px; font-size: 12px; }
-      .meta { font-size: 12px; color: #555; margin-top: 6px; }
-      .score { font-weight: bold; }
-      .controls { margin: 12px 0 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+      .card { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: #fff; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--pill); margin-left: 8px; font-size: 12px; }
+      .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+      .score { font-weight: 700; }
+      .controls { margin: 12px 0 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
       label { font-size: 14px; }
-      input, select { padding: 6px 8px; }
+      input, select, textarea, button { padding: 8px 10px; font: inherit; }
+      .section { margin-top: 24px; }
+      .form { border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .form textarea { grid-column: 1 / -1; min-height: 64px; }
+      .row { display: flex; gap: 8px; align-items: center; }
+      .help { font-size: 12px; color: var(--muted); }
+      .toolbar { display:flex; gap:10px; align-items:center; margin: 6px 0 18px; }
+      .btn { border:1px solid var(--border); background:#fafafa; border-radius:8px; cursor:pointer; }
+      .btn:active { transform: translateY(1px); }
+      .count-pill { margin-left: 8px; background: #f3f3f3; padding: 2px 8px; border-radius:999px; font-size:12px; }
+      @media (prefers-color-scheme: dark){
+        body{ background:#0b0b0b; color:#f5f5f5;}
+        .card{ background:#141414; border-color:#2a2a2a; }
+        .form{ background:#141414; border-color:#2a2a2a; }
+        .btn{ background:#1a1a1a; border-color:#2a2a2a; color:#f5f5f5;}
+        .pill{ background:#222; }
+        .help{ color:#bbb; }
+        .meta{ color:#bbb; }
+      }
     </style>
   </head>
   <body>
-    <h1>Roadmap Visualiser <span class="pill" id="count"></span></h1>
+    <h1>Roadmap Visualiser <span class="count-pill" id="count"></span></h1>
+
     <div class="controls">
       <label>Quarter:
         <select id="quarterFilter">
@@ -39,18 +59,86 @@
       <label>Search:
         <input id="search" placeholder="Search titles…"/>
       </label>
+      <div class="toolbar">
+        <button id="downloadBtn" class="btn">Download JSON</button>
+        <button id="resetLocalBtn" class="btn" title="Clear only your browser’s saved items">Reset local changes</button>
+      </div>
     </div>
+
     <div class="grid" id="grid"></div>
+
+    <div class="section">
+      <h2>Add a project</h2>
+      <div class="help">This updates your view immediately and saves to your browser only (localStorage). Use “Download JSON” to export and commit later.</div>
+      <div class="form" id="addForm">
+        <label>Title<br/><input id="f_title" required /></label>
+        <label>Quarter<br/>
+          <select id="f_quarter">
+            <option>2025 Q1</option><option>2025 Q2</option>
+            <option>2025 Q3</option><option>2025 Q4</option>
+          </select>
+        </label>
+        <label>Owner<br/><input id="f_owner" placeholder="e.g., Sarah" /></label>
+        <label>Team<br/><input id="f_team" placeholder="e.g., Core" /></label>
+        <label>Reach<br/><input id="f_reach" type="number" min="0" value="100" /></label>
+        <label>Impact<br/>
+          <select id="f_impact">
+            <option value="3">3 — Huge</option>
+            <option value="2" selected>2 — Medium</option>
+            <option value="1">1 — Small</option>
+            <option value="0.5">0.5 — Very minor</option>
+            <option value="0.25">0.25 — Minimal</option>
+          </select>
+        </label>
+        <label>Confidence<br/>
+          <select id="f_confidence">
+            <option value="1">1.0 — Strong data</option>
+            <option value="0.8" selected>0.8 — Fairly confident</option>
+            <option value="0.6">0.6 — Moderate</option>
+            <option value="0.4">0.4 — Low</option>
+          </select>
+        </label>
+        <label>Effort<br/>
+          <select id="f_effort">
+            <option value="1">1 — ~1 week</option>
+            <option value="2" selected>2 — ~2–3 weeks</option>
+            <option value="3">3 — ~1 month</option>
+            <option value="4">4 — 1–2 months</option>
+            <option value="5">5 — 2+ months</option>
+          </select>
+        </label>
+        <label style="grid-column:1/-1;">Description<br/>
+          <textarea id="f_description" placeholder="Short scope / why it matters"></textarea>
+        </label>
+        <div class="row" style="grid-column:1/-1;">
+          <button class="btn" id="addBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Scoring guide</h3>
+        <div class="help">
+          <strong>RICE = (Reach × Impact × Confidence) / Effort</strong><br/>
+          Impact: 3 Huge, 2 Medium, 1 Small, 0.5 Very minor, 0.25 Minimal<br/>
+          Effort: 1 ≈ 1 week, 2 ≈ 2–3 weeks, 3 ≈ 1 month, 4 ≈ 1–2 months, 5 ≈ 2+ months<br/>
+          Confidence: 1.0 strong data, 0.8 fairly confident, 0.6 moderate, 0.4 low
+        </div>
+      </div>
+    </div>
+
     <script>
       const state = { items: [], quarter: "", sortBy: "rice", search: "" };
-
-      async function load() {
-        const res = await fetch('data.json');
-        state.items = await res.json();
-        render();
-      }
+      const LS_KEY = "roadmap_custom_items_v1";
 
       function riceScore(i){ return Math.round((i.reach * i.impact * i.confidence) / Math.max(1, i.effort)); }
+
+      async function load() {
+        const res = await fetch('data.json', {cache:'no-store'});
+        const base = await res.json();
+        const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+        state.items = [...base, ...extra];
+        render();
+      }
 
       function render(){
         const q = state.quarter, s = state.sortBy, term = state.search.toLowerCase();
@@ -61,21 +149,72 @@
           return (riceScore(b) - riceScore(a));
         });
         document.getElementById('count').textContent = filtered.length + " items";
-        const grid = document.getElementById('grid');
-        grid.innerHTML = filtered.map(i=>`
+        document.getElementById('grid').innerHTML = filtered.map(i=>`
           <div class="card">
-            <div><strong>${i.title}</strong> <span class="pill">${i.quarter}</span></div>
-            <div class="meta">Owner: ${i.owner || '—'} | Team: ${i.team || '—'}</div>
+            <div><strong>${escapeHtml(i.title)}</strong> <span class="pill">${escapeHtml(i.quarter || '')}</span></div>
+            <div class="meta">Owner: ${escapeHtml(i.owner || '—')} | Team: ${escapeHtml(i.team || '—')}</div>
             <div class="meta">Reach ${i.reach}, Impact ${i.impact}, Confidence ${i.confidence}, Effort ${i.effort}</div>
             <div class="meta score">RICE: ${riceScore(i)}</div>
-            <p>${i.description || ''}</p>
+            <p>${escapeHtml(i.description || '')}</p>
           </div>
         `).join('');
       }
 
+      function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+      // filters
       document.getElementById('quarterFilter').addEventListener('change', e => { state.quarter = e.target.value; render(); });
       document.getElementById('sortBy').addEventListener('change', e => { state.sortBy = e.target.value; render(); });
       document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
+
+      // add project
+      document.getElementById('addBtn').addEventListener('click', () => {
+        const item = {
+          title: val('f_title'),
+          quarter: val('f_quarter'),
+          owner: val('f_owner'),
+          team: val('f_team'),
+          reach: num('f_reach'),
+          impact: parseFloat(val('f_impact')),
+          confidence: parseFloat(val('f_confidence')),
+          effort: parseFloat(val('f_effort')),
+          description: val('f_description')
+        };
+        if(!item.title){ alert('Please enter a title'); return; }
+        // append to localStorage list
+        const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+        extra.push(item);
+        localStorage.setItem(LS_KEY, JSON.stringify(extra));
+        state.items.push(item);
+        // reset a few fields
+        document.getElementById('f_title').value = "";
+        document.getElementById('f_description').value = "";
+        render();
+        window.scrollTo({top:0, behavior:'smooth'});
+      });
+
+      // download current dataset
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        const extra = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+        // base + extras so you can commit it later if you want to
+        const blob = new Blob([JSON.stringify(state.items, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'data.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      // reset local additions (does not change the repo)
+      document.getElementById('resetLocalBtn').addEventListener('click', () => {
+        if(confirm('Clear your locally added projects?')) {
+          localStorage.removeItem(LS_KEY);
+          load();
+        }
+      });
+
+      function val(id){ return document.getElementById(id).value; }
+      function num(id){ return parseFloat(val(id) || '0'); }
 
       load();
     </script>
