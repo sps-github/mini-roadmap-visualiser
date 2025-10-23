@@ -210,6 +210,18 @@
       }
       .plan-results{ margin-top:12px; font-size:14px; }
       .plan-results ul{ margin:8px 0 0 18px; }
+.help-inline{
+  margin: 4px 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.help-inline code{
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  border: 1px solid var(--chip-border);
+  border-radius: 6px;
+  padding: 0 6px;
+}
     </style>
   </head>
   <body>
@@ -266,7 +278,12 @@
     <div class="section">
       <h2>Capacity fit</h2>
       <div class="planner">
-        <div class="help">Enter team capacity (in “effort” units for the selected quarter). Click <strong>Suggest plan</strong> to pick the highest-value set that fits.</div>
+        <div class="help">
+  Enter team capacity in <strong>Effort units</strong> for the selected quarter, then click
+  <strong>Suggest plan</strong>. We’ll choose the mix of projects that
+  <strong>maximises total RICE</strong> without exceeding capacity. We also try to include any
+  <strong>dependencies</strong>.
+</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
           <label>Quarter
             <select id="planQuarter">
@@ -322,9 +339,13 @@
             <option value="5">5 — 2+ months</option>
           </select>
         </label>
-        <label>Depends on (titles, comma-separated)<br/>
-          <input id="f_depends" placeholder="e.g., SDK adapter layer, Data pipeline" />
-        </label>
+<label>Dependencies<br/>
+  <input id="f_depends" placeholder="Type project titles, separated by commas" />
+</label>
+<div class="help help-inline">
+  List any projects this one <em>needs first</em>. Use exact titles, separated by commas.
+  Example: <code>SDK adapter layer, Data pipeline</code>
+</div>
         <label style="grid-column:1/-1;">Description<br/>
           <textarea id="f_description" placeholder="Short scope / why it matters"></textarea>
         </label>
@@ -389,7 +410,7 @@
           const deps = (i.dependsOn || []).filter(Boolean);
           const missing = deps.filter(d => !byTitle.has(d.trim().toLowerCase()));
           const depsHtml = deps.length
-            ? `<div class="meta">Depends on: ${deps.map(escapeHtml).join(', ')}</div>` : '';
+  ? `<div class="meta">Dependencies: ${deps.map(escapeHtml).join(', ')}</div>` : '';
 
           const warnHtml = missing.length
             ? `<div class="warn">Missing dependency: ${missing.map(escapeHtml).join(', ')}</div>` : '';
@@ -533,6 +554,15 @@
             </div>
           </div>
         `;
+// Add a small legend beneath the results
+const planOutEl = document.getElementById('planOut');
+planOutEl.insertAdjacentHTML('beforeend', `
+  <div class="help" style="margin-top:8px">
+    Legend: <strong>E</strong> = Effort, <strong>R</strong> = RICE score.
+    We pick items that fit your capacity and try to include required dependencies.
+  </div>
+`);
+
       });
 
       // ---------- AI Assist (heuristic, no API required) ----------
